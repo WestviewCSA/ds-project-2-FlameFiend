@@ -35,4 +35,8 @@ public class p2 {
             System.out.println("File not found!");
         }
     }
+    public static String queueRoute(String filename) {
+    	readMap(filename);
+    	
+    }
 }
