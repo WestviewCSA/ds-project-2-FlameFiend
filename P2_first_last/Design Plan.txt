@@ -3,6 +3,10 @@ due 3/12/25 11:59pm
 
 after reading the specs, start populating a list of things you think you might have to do to finish this project.
 
+map reader
+tile object creator
+map class
+tile class
 text map check for errors
 queue route
 stack route
