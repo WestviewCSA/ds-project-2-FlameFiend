@@ -35,25 +35,7 @@ public class p2 {
             System.out.println("File not found!");
         }
     }
-    public static void coordRead(String filename) {
-    	try {
-            File file = new File(filename);
-            Scanner scanner = new Scanner(file);
-            int numRows = scanner.nextInt();
-            int numCols = scanner.nextInt();
-            int numRooms = scanner.nextInt();
-            scanner.nextLine();
-
-            Tile[][] map = new Tile[numRows][numCols];
-
-            
-
-            scanner.close();
-
-        } catch (FileNotFoundException e) {
-            System.out.println("File not found!");
-        }
-    }
+    
     public static String queueRoute(String filename) {
     	readMap(filename);
     	
