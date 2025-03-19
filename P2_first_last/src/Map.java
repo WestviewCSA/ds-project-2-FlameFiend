@@ -5,6 +5,7 @@ import java.util.Scanner;
 public class Map {
     private Tile[][] map;
     private int numRows, numCols, numRooms;
+    private Tile start, goal;
 
     public Map(String filename) {
         readMap(filename);
@@ -17,14 +18,18 @@ public class Map {
             numRows = scanner.nextInt();
             numCols = scanner.nextInt();
             numRooms = scanner.nextInt();
-            scanner.nextLine(); // Move to next line
+            scanner.nextLine();
 
             map = new Tile[numRows][numCols];
 
             for (int row = 0; row < numRows; row++) {
                 String line = scanner.nextLine();
                 for (int col = 0; col < Math.min(numCols, line.length()); col++) {
-                    map[row][col] = new Tile(row, col, line.charAt(col));
+                    char type = line.charAt(col);
+                    map[row][col] = new Tile(row, col, type);
+
+                    if (type == 'S') start = map[row][col];
+                    if (type == 'G') goal = map[row][col];
                 }
             }
             scanner.close();
@@ -45,7 +50,11 @@ public class Map {
         return numCols;
     }
 
-    public int getNumRooms() {
-        return numRooms;
+    public Tile getStart() {
+        return start;
+    }
+
+    public Tile getGoal() {
+        return goal;
     }
 }
