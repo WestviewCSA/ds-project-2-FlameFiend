@@ -1,46 +1,46 @@
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Scanner;
 
 public class p2 {
 
     public static void main(String[] args) {
         System.out.println("p2");
-    }
+    }	
+    private static String queueRoute(Map gameMap) {
+        Tile[][] map = gameMap.getMap();
+        Tile start = gameMap.getStart();
+        Tile goal = gameMap.getGoal();
+        if (start == null || goal == null) return "Start or Goal not found!";
 
-    public static void readMap(String filename) {
-        try {
-            File file = new File(filename);
-            Scanner scanner = new Scanner(file);
-            int numRows = scanner.nextInt();
-            int numCols = scanner.nextInt();
-            int numRooms = scanner.nextInt();
-            scanner.nextLine();
+        Queue<Tile> queue = new LinkedList<>();
+        Map<Tile, Tile> cameFrom = new HashMap<>();
+        queue.add(start);
+        cameFrom.put(start, null);
 
-            Tile[][] map = new Tile[numRows][numCols];
+        while (!queue.isEmpty()) {
+            Tile current = queue.poll();
+            if (current == goal) return reconstructPath(cameFrom, goal);
 
-            int rowIndex = 0;
-            while (scanner.hasNextLine() && rowIndex < numRows) {
-                String row = scanner.nextLine();
-                for (int i = 0; i < numCols && i < row.length(); i++) {
-                    char el = row.charAt(i);
-                    map[rowIndex][i] = new Tile(rowIndex, i, el);
+            for (int[] dir : DIRECTIONS) {
+                int newRow = current.getRow() + dir[0];
+                int newCol = current.getCol() + dir[1];
+
+                if (isValidMove(map, newRow, newCol) && !cameFrom.containsKey(map[newRow][newCol])) {
+                    queue.add(map[newRow][newCol]);
+                    cameFrom.put(map[newRow][newCol], current);
                 }
-                rowIndex++;
             }
-
-            scanner.close();
-
-        } catch (FileNotFoundException e) {
-            System.out.println("File not found!");
         }
+        return "No Path Found!";
     }
-    
-    public static String queueRoute(String filename) {
-    	readMap(filename);
-    	
-    	return"";
+    private static boolean isValidMove(Tile[][] map, int row, int col) {
+        return row >= 0 && row < map.length && col >= 0 && col < map[0].length && map[row][col].getType() != '#';
     }
+
     public static String stackRoute(String filename) {
     	readMap(filename);
     	
