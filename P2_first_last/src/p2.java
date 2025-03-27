@@ -109,4 +109,38 @@ public class p2 {
 	        grid[roomIndex].print();
 	    }
 	}
+	public static void stackSolve() {
+	    for (int roomIndex = 0; roomIndex < numRooms; roomIndex++) {
+	        Stack<Tile> stack = new Stack<>();
+	        boolean[][] visited = new boolean[numRows][numCols];
+	        int[][] distance = new int[numRows][numCols];
+	        
+	        for (int row = 0; row < numRows; row++) {
+	            for (int col = 0; col < numCols; col++) {
+	                distance[row][col] = -1;
+	                if (grid[roomIndex].get(row, col).getType() == 'W') {
+	                    stack.push(grid[roomIndex].get(row, col));
+	                    visited[row][col] = true;
+	                    distance[row][col] = 0;
+	                }
+	            }
+	        }
+	        
+	        while (!stack.isEmpty()) {
+	            Tile currentTile = stack.pop();
+	            int currentRow = currentTile.getRow(), currentCol = currentTile.getCol();
+	            
+	            for (int direction = 0; direction < 4; direction++) {
+	                int nextRow = currentRow + dRow[direction], nextCol = currentCol + dCol[direction];
+	                if (nextRow >= 0 && nextCol >= 0 && nextRow < numRows && nextCol < numCols && !visited[nextRow][nextCol] && grid[roomIndex].get(nextRow, nextCol).getType() != '@') {
+	                    visited[nextRow][nextCol] = true;
+	                    distance[nextRow][nextCol] = distance[currentRow][currentCol] + 1;
+	                    stack.push(grid[roomIndex].get(nextRow, nextCol));
+	                }
+	            }
+	        }
+	        
+	        grid[roomIndex].print();
+	    }
+	}
 }
