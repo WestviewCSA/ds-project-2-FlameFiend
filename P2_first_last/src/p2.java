@@ -44,69 +44,66 @@ public class p2 {
 	    for (int roomIndex = 0; roomIndex < numRooms; roomIndex++) {
 	        Queue<Tile> queue = new LinkedList<>();
 	        boolean[][] visited = new boolean[numRows][numCols];
-	        int[][] distance = new int[numRows][numCols];
+	        Tile[][] parent = new Tile[numRows][numCols];  //track the path
 	        
-	        // Initialize distances and enqueue starting points ('W')
+	        //enqueue starting point
 	        for (int row = 0; row < numRows; row++) {
 	            for (int col = 0; col < numCols; col++) {
-	                distance[row][col] = -1;
 	                if (grid[roomIndex].get(row, col).getType() == 'W') {
 	                    queue.add(grid[roomIndex].get(row, col));
 	                    visited[row][col] = true;
-	                    distance[row][col] = 0;
+	                    parent[row][col] = null; //no parent for start
 	                }
 	            }
 	        }
-	        
-	        // Perform BFS to calculate distances
+
+	        //find % or |
 	        while (!queue.isEmpty()) {
 	            Tile currentTile = queue.poll();
-	            int currentRow = currentTile.getRow(), currentCol = currentTile.getCol();
-	            
+	            int currentRow = currentTile.getRow();
+	            int currentCol = currentTile.getCol();
+
+	            //check target reached
+	            if (grid[roomIndex].get(currentRow, currentCol).getType() == '$' || 
+	                grid[roomIndex].get(currentRow, currentCol).getType() == '|') {
+	                
+	                //reconstruct path
+	                LinkedList<Tile> path = new LinkedList<>();
+	                Tile targetTile = currentTile;
+	                
+	                while (targetTile != null) {
+	                    path.addFirst(targetTile); //reverse list
+	                    targetTile = parent[targetTile.getRow()][targetTile.getCol()];
+	                }
+	                
+	                //mark the path
+	                for (Tile t : path) {
+	                    if (t.getType() == '.') {
+	                        t.setType('+'); 
+	                    }
+	                }
+	                
+	                System.out.println("Path found:");
+	                grid[roomIndex].print();  //Print the grid with the path marked
+	                return;
+	            }
+
+	            //4 directions
 	            for (int direction = 0; direction < 4; direction++) {
-	                int nextRow = currentRow + dRow[direction], nextCol = currentCol + dCol[direction];
-	                if (nextRow >= 0 && nextCol >= 0 && nextRow < numRows && nextCol < numCols && !visited[nextRow][nextCol] && grid[roomIndex].get(nextRow, nextCol).getType() != '@') {
+	                int nextRow = currentRow + dRow[direction];
+	                int nextCol = currentCol + dCol[direction];
+
+	                if (nextRow >= 0 && nextCol >= 0 && nextRow < numRows && nextCol < numCols &&
+	                    !visited[nextRow][nextCol] && grid[roomIndex].get(nextRow, nextCol).getType() != '@') {
 	                    visited[nextRow][nextCol] = true;
-	                    distance[nextRow][nextCol] = distance[currentRow][currentCol] + 1;
+	                    parent[nextRow][nextCol] = currentTile;  //set the parent
 	                    queue.add(grid[roomIndex].get(nextRow, nextCol));
 	                }
 	            }
 	        }
-	        
-	        // Find target tile ('$' or '|')
-	        int targetRow = -1, targetCol = -1;
-	        for (int row = 0; row < numRows; row++) {
-	            for (int col = 0; col < numCols; col++) {
-	                if ((grid[roomIndex].get(row, col).getType() == '$' || grid[roomIndex].get(row, col).getType() == '|') && visited[row][col]) {
-	                    targetRow = row;
-	                    targetCol = col;
-	                }
-	            }
-	        }
-	        
-	        if (targetRow == -1) {
-	            System.out.println("The Wolverine Store is closed.");
-	            return;
-	        }
-	        
-	        // Reconstruct shortest path
-	        path = new LinkedList<>();
-	        while (distance[targetRow][targetCol] != 0) {
-	            for (int direction = 0; direction < 4; direction++) {
-	                int prevRow = targetRow + dRow[direction], prevCol = targetCol + dCol[direction];
-	                if (prevRow >= 0 && prevCol >= 0 && prevRow < numRows && prevCol < numCols && visited[prevRow][prevCol] && distance[prevRow][prevCol] == distance[targetRow][targetCol] - 1) {
-	                    if (grid[roomIndex].get(prevRow, prevCol).getType() == '.') {
-	                        grid[roomIndex].get(prevRow, prevCol).setType('+');
-	                        path.addFirst(grid[roomIndex].get(prevRow, prevCol));
-	                    }
-	                    targetRow = prevRow;
-	                    targetCol = prevCol;
-	                    break;
-	                }
-	            }
-	        }
-	        
-	        grid[roomIndex].print();
+
+	        //if the target was not found
+	        System.out.println("Target not found.");
 	    }
 	}
 	public static void stackSolve() {
@@ -142,5 +139,82 @@ public class p2 {
 	        
 	        grid[roomIndex].print();
 	    }
+	}
+	public static void optimalSolve() {
+	    Queue<int[]> queue = new LinkedList<>();
+	    boolean[][] visited = new boolean[numRows][numCols];
+	    int[][] parentRow = new int[numRows][numCols];
+	    int[][] parentCol = new int[numRows][numCols]; 
+
+	    // Find the starting point 'W' and enqueue it
+	    for (int roomIndex = 0; roomIndex < numRooms; roomIndex++) {
+	        for (int row = 0; row < numRows; row++) {
+	            for (int col = 0; col < numCols; col++) {
+	                if (grid[roomIndex].get(row, col).getType() == 'W') {
+	                    queue.add(new int[]{row, col});
+	                    visited[row][col] = true;
+	                    parentRow[row][col] = -1; // start no parent
+	                    parentCol[row][col] = -1; // start no parent
+	                }
+	            }
+	        }
+	    }
+	    
+	    while (!queue.isEmpty()) {
+	        int[] current = queue.poll();
+	        int currentRow = current[0];
+	        int currentCol = current[1];
+
+	        // check if $ is reached
+	        if (grid[roomIndex].get(currentRow, currentCol).getType() == '$' || 
+	            grid[roomIndex].get(currentRow, currentCol).getType() == '|') {
+	            //remake path
+	            LinkedList<int[]> path = new LinkedList<>();
+	            int targetRow = currentRow;
+	            int targetCol = currentCol;
+
+	            while (targetRow != -1 && targetCol != -1) {
+	                path.addFirst(new int[]{targetRow, targetCol});
+	                int tempRow = parentRow[targetRow][targetCol];
+	                int tempCol = parentCol[targetRow][targetCol];
+	                targetRow = tempRow;
+	                targetCol = tempCol;
+	            }
+	            for (int[] pos : path) {
+	                int row = pos[0];
+	                int col = pos[1];
+	                if (grid[roomIndex].get(row, col).getType() == '.') {
+	                    grid[roomIndex].get(row, col).setType('+');  //mark +
+	                }
+	            }
+
+	            System.out.println("Path found:");
+	            grid[roomIndex].print(); //print grid
+	            return;
+	        }
+
+	        //check all directions
+	        for (int direction = 0; direction < 4; direction++) {
+	            int nextRow = currentRow + dRow[direction];
+	            int nextCol = currentCol + dCol[direction];
+
+	            //next tile is possible
+	            if (nextRow >= 0 && nextCol >= 0 && nextRow < numRows && nextCol < numCols &&
+	                !visited[nextRow][nextCol] && (grid[roomIndex].get(nextRow, nextCol).getType() != '@')) {
+
+	                //check for | or .
+	                if (grid[roomIndex].get(nextRow, nextCol).getType() == '|' || 
+	                    grid[roomIndex].get(nextRow, nextCol).getType() == '.') {
+	                    visited[nextRow][nextCol] = true;
+	                    parentRow[nextRow][nextCol] = currentRow;  // parent row
+	                    parentCol[nextRow][nextCol] = currentCol;  //parent col
+	                    queue.add(new int[]{nextRow, nextCol});
+	                }
+	            }
+	        }
+	    }
+
+	    //target not found
+	    System.out.println("Target not found.");
 	}
 }
