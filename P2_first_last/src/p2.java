@@ -1,54 +1,43 @@
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Scanner;
-
+import java.util.Stack;
 public class p2 {
-
-    public static void main(String[] args) {
-        System.out.println("p2");
-    }	
-    private static String queueRoute(Map gameMap) {
-        Tile[][] map = gameMap.getMap();
-        Tile start = gameMap.getStart();
-        Tile goal = gameMap.getGoal();
-        if (start == null || goal == null) return "Start or Goal not found!";
-
-        Queue<Tile> queue = new LinkedList<>();
-        Map<Tile, Tile> cameFrom = new HashMap<>();
-        queue.add(start);
-        cameFrom.put(start, null);
-
-        while (!queue.isEmpty()) {
-            Tile current = queue.poll();
-            if (current == goal) return reconstructPath(cameFrom, goal);
-
-            for (int[] dir : DIRECTIONS) {
-                int newRow = current.getRow() + dir[0];
-                int newCol = current.getCol() + dir[1];
-
-                if (isValidMove(map, newRow, newCol) && !cameFrom.containsKey(map[newRow][newCol])) {
-                    queue.add(map[newRow][newCol]);
-                    cameFrom.put(map[newRow][newCol], current);
-                }
-            }
-        }
-        return "No Path Found!";
-    }
-    private static boolean isValidMove(Tile[][] map, int row, int col) {
-        return row >= 0 && row < map.length && col >= 0 && col < map[0].length && map[row][col].getType() != '#';
-    }
-
-    public static String stackRoute(String filename) {
-    	readMap(filename);
-    	
-    	return"";
-    }
-    public static String optimalRoute(String filename) {
-    	readMap(filename);
-    	
-    	return"";
-    }
+	static int[] dRow = {0, 1, 0, -1};
+	static int[] dCol = {1, 0, -1, 0};
+	static Map[] grid;
+	static LinkedList<Tile> path;
+	static int numRows, numCols, numRooms;
+	public static void main(String[] args) {
+        readMap("test1");
+	}
+	public static void readMap(String filename) {
+		try {
+			File file = new File(filename);
+			Scanner scanner = new Scanner(file);
+			numRows = scanner.nextInt();
+			numCols = scanner.nextInt();
+			numRooms = scanner.nextInt();
+			grid = new Map[numRooms];
+			int rowIndex = 0;
+			for (int room = 0; room < numRooms; room++) {
+				grid[room] = new Map(numRows, numCols);
+				while (scanner.hasNextLine() && rowIndex < numRows) {
+					String row = scanner.nextLine();
+					if (row.length() > 0) {
+						for (int i = 0; i < numCols && i < row.length(); i++) {
+							char el = row.charAt(i);
+							Tile tile = new Tile(rowIndex, i, el);
+							grid[room].set(rowIndex, i, tile);
+						}
+						rowIndex++;
+					}
+				}
+			}
+		} catch (FileNotFoundException e) {
+			System.out.println(e);
+		}
+	}
 }
