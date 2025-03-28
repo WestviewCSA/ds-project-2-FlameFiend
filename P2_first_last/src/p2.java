@@ -11,8 +11,22 @@ public class p2 {
 	static LinkedList<Tile> path;
 	static int numRows, numCols, numRooms;
 	public static void main(String[] args) {
-        readMap("test1");
-	}
+        // Iterate over all test files (test1.txt to test5.txt)
+        for (int i = 1; i <= 5; i++) {
+            String filename = "test" + i + ".txt";
+            System.out.println("Testing with map file: " + filename);
+            readMap(filename);
+
+            // Call each solve method and print the result
+            System.out.println("Queue-based Solution:");
+            queueSolve();
+            System.out.println("\nStack-based Solution:");
+            stackSolve();
+            System.out.println("\nOptimal Solution:");
+            optimalSolve();
+            System.out.println("\n--------------------------------------------\n");
+        }
+    }
 	public static void readMap(String filename) {
 		try {
 			File file = new File(filename);
