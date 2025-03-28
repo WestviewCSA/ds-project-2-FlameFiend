@@ -11,29 +11,42 @@ public class p2 {
 	static LinkedList<Tile> path;
 	static int numRows, numCols, numRooms;
 	public static void main(String[] args) {
-		if (args.length == 0) {
-	        System.out.println("Usage: java p2 <filename>");
-	        return;
-	    }
+		public static void main(String[] args) {
+		    if (args.length == 0) {
+		        System.out.println("Usage: java p2 <filename>");
+		        return;
+		    }
 
-	    String filename = args[args.length-1]; // get filename from command-line argument
-	    System.out.println("Testing with map file: " + filename);
-	    readMap(filename);
-        // iterate over all test files (test1.txt to test5.txt)
-        for (int i = 1; i <= 5; i++) {
-            String filename = "test" + i + ".txt";
-            System.out.println("Testing with map file: " + filename);
-            readMap(filename);
+		    String filename = args[args.length - 1]; // get filename from command-line argument
+		    System.out.println("Testing with map file: " + filename);
+		    readMap(filename);
 
-            // call each solve method and print the result
-            System.out.println("Queue-based Solution:");
-            queueSolve();
-            System.out.println("\nStack-based Solution:");
-            stackSolve();
-            System.out.println("\nOptimal Solution:");
-            optimalSolve();
-            System.out.println("\n--------------------------------------------\n");
-        }
+		    for (int i = 1; i <= 5; i++) {
+		        filename = "test" + i + ".txt";
+		        System.out.println("Testing with map file: " + filename);
+		        readMap(filename);
+
+		        // Measure execution time for queue-based solution
+		        double startTime = System.nanoTime();
+		        queueSolve();
+		        double endTime = System.nanoTime();
+		        System.out.printf("Queue-based Solution Time: %.6f ms%n", (endTime - startTime) / 1_000_000.0);
+
+		        // Measure execution time for stack-based solution
+		        startTime = System.nanoTime();
+		        stackSolve();
+		        endTime = System.nanoTime();
+		        System.out.printf("Stack-based Solution Time: %.6f ms%n", (endTime - startTime) / 1_000_000.0);
+
+		        // Measure execution time for optimal solution
+		        startTime = System.nanoTime();
+		        optimalSolve();
+		        endTime = System.nanoTime();
+		        System.out.printf("Optimal Solution Time: %.6f ms%n", (endTime - startTime) / 1_000_000.0);
+
+		        System.out.println("\n--------------------------------------------\n");
+		    }
+		}
     }
 	public static void readMap(String filename) {
 		try {
@@ -81,7 +94,9 @@ public class p2 {
 
 	        //find % or |
 	        while (!queue.isEmpty()) {
-	            Tile currentTile = queue.poll();
+	        	if (!queue.isEmpty()) {
+	        	    Tile currentTile = queue.remove();
+	        	}
 	            int currentRow = currentTile.getRow();
 	            int currentCol = currentTile.getCol();
 
@@ -183,7 +198,9 @@ public class p2 {
 	    }
 	    
 	    while (!queue.isEmpty()) {
-	        int[] current = queue.poll();
+	    	if (!queue.isEmpty()) {
+	    	    int[] current = queue.remove();
+	    	}
 	        int currentRow = current[0];
 	        int currentCol = current[1];
 
@@ -206,7 +223,7 @@ public class p2 {
 	                int row = pos[0];
 	                int col = pos[1];
 	                if (grid[roomIndex].get(row, col).getType() == '.') {
-	                    grid[roomIndex].get(row, col).setType('+');  //mark +
+	                    grid[roomIndex].get(row, col).setType('+');  //mark +'s
 	                }
 	            }
 
