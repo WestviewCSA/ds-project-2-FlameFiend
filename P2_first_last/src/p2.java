@@ -11,13 +11,21 @@ public class p2 {
 	static LinkedList<Tile> path;
 	static int numRows, numCols, numRooms;
 	public static void main(String[] args) {
-        // Iterate over all test files (test1.txt to test5.txt)
+		if (args.length == 0) {
+	        System.out.println("Usage: java p2 <filename>");
+	        return;
+	    }
+
+	    String filename = args[args.length-1]; // get filename from command-line argument
+	    System.out.println("Testing with map file: " + filename);
+	    readMap(filename);
+        // iterate over all test files (test1.txt to test5.txt)
         for (int i = 1; i <= 5; i++) {
             String filename = "test" + i + ".txt";
             System.out.println("Testing with map file: " + filename);
             readMap(filename);
 
-            // Call each solve method and print the result
+            // call each solve method and print the result
             System.out.println("Queue-based Solution:");
             queueSolve();
             System.out.println("\nStack-based Solution:");
